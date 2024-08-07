@@ -11,11 +11,6 @@ export class RentService {
       // TODO
       // update if not found will throw error
       // convert error to custom error
-      const scooter = await prisma.scooter.update({
-        where: { id: body.scooterId, rentAble: true, activeRentId: null },
-        data: { rentAble: false },
-      });
-
       const rent = await prisma.rent.create({
         data: {
           startDate: new Date(),
@@ -27,6 +22,11 @@ export class RentService {
       const user = await prisma.user.update({
         where: { id: body.userId, activeRentId: null },
         data: { activeRentId: rent.id },
+      });
+
+      const scooter = await prisma.scooter.update({
+        where: { id: body.scooterId, rentAble: true, activeRentId: null },
+        data: { rentAble: false, activeRentId: rent.id },
       });
 
       return { scooter, rent, user };
