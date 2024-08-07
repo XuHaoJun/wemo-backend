@@ -9,7 +9,10 @@ pnpm install --frozen-lockfile
 # for db, redis
 docker compose up -d
 
-# create all db tables
+# config your database url
+cp .env.example .env
+
+# create all db tables, make sure your database url is right
 npx prisma migrate deploy
 
 # run it ^_^
