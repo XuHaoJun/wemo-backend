@@ -69,6 +69,7 @@ export class RentService {
         where: { id: body.scooterId, activeRentId: user.activeRentId },
         data: {
           activeRentId: null,
+          rentAble: true,
         },
       });
 
