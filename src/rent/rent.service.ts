@@ -72,7 +72,7 @@ export class RentService {
         },
       });
 
-      const updateRent = await prisma.rent.update({
+      const updatedRent = await prisma.rent.update({
         where: { id: user.activeRentId },
         data: {
           endDate: new Date(),
@@ -83,7 +83,7 @@ export class RentService {
         user,
         updatedUser,
         updatedScooter,
-        updateRent,
+        updateRent: updatedRent,
       };
     });
     return result.updateRent;
