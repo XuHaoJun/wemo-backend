@@ -84,9 +84,9 @@ export class RentService {
         user,
         updatedUser,
         updatedScooter,
-        updateRent: updatedRent,
+        updatedRent,
       };
     });
-    return result.updateRent;
+    return result.updatedRent;
   }
 }
