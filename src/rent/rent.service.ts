@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateRentDto } from './dto/createRent.dto';
 import { ReturnRentDto } from './dto/returnRent.dto';
@@ -21,7 +21,7 @@ export class RentService {
         data: { activeRentId: rent.id },
       });
       if (userUpdateResult.count === 0) {
-        throw new Error('TODO');
+        throw new BadRequestException('User has active rent');
       }
 
       const scooterUpdateResult = await prisma.scooter.updateMany({
@@ -29,7 +29,7 @@ export class RentService {
         data: { rentAble: false, activeRentId: rent.id },
       });
       if (scooterUpdateResult.count === 0) {
-        throw new Error('TODO');
+        throw new BadRequestException('Scooter is not rentable');
       }
 
       return { rent };
@@ -51,8 +51,7 @@ export class RentService {
         // TODO
         // 沒有租借中,但想還車？應紀錄log
         errors.push(new Error('User has no active rent'));
-      }
-      if (user.activeRent.scooterId !== body.scooterId) {
+      } else if (user.activeRent.scooterId !== body.scooterId) {
         // TODO
         // 租借中,但還到別台車？應紀錄log
         errors.push(new Error('User return incorrect scooter'));
