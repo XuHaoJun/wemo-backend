@@ -19,3 +19,7 @@ npx prisma migrate deploy
 # run it ^_^
 npm run start:dev
 ```
+
+## Swagger
+
+open `http://localhost:3000/swagger`
