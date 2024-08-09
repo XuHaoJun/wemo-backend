@@ -8,9 +8,6 @@ export class RentService {
   constructor(private readonly prisma: PrismaService) {}
   async rent(body: CreateRentDto) {
     const result = await this.prisma.$transaction(async (prisma) => {
-      // TODO
-      // update if not found will throw error
-      // convert error to custom error
       const rent = await prisma.rent.create({
         data: {
           startDate: new Date(),
@@ -19,17 +16,23 @@ export class RentService {
         },
       });
 
-      const user = await prisma.user.update({
+      const userUpdateResult = await prisma.user.updateMany({
         where: { id: body.userId, activeRentId: null },
         data: { activeRentId: rent.id },
       });
+      if (userUpdateResult.count === 0) {
+        throw new Error('TODO');
+      }
 
-      const scooter = await prisma.scooter.update({
+      const scooterUpdateResult = await prisma.scooter.updateMany({
         where: { id: body.scooterId, rentAble: true, activeRentId: null },
         data: { rentAble: false, activeRentId: rent.id },
       });
+      if (scooterUpdateResult.count === 0) {
+        throw new Error('TODO');
+      }
 
-      return { scooter, rent, user };
+      return { rent };
     });
 
     return result.rent;
