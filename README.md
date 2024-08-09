@@ -12,7 +12,8 @@ docker compose up -d
 # config your database url
 cp .env.example .env
 
-# create all db tables, make sure your database url is right
+# init prisma client and create all db tables, make sure your database url is right
+npx prisma generate
 npx prisma migrate deploy
 
 # run it ^_^
