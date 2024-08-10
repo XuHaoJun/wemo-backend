@@ -14,28 +14,48 @@ datasource db {
 }
 
 model User {
-  id           Int     @id @default(autoincrement())
-  rents        Rent[]
-  activeRent   Rent?   @relation("UserActiveRent", fields: [activeRentId], references: [id])
-  activeRentId String? @unique
+  id                  Int           @id @default(autoincrement())
+  rents               Rent[]
+  activeRent          Rent?         @relation("UserActiveRent", fields: [activeRentId], references: [id])
+  activeRentId        String?       @unique
+  reservations        Reservation[]
+  activeReservation   Reservation?  @relation("UserActiveReservation", fields: [activeReservationId], references: [id])
+  activeReservationId String?       @unique
 }
 
 model Scooter {
-  id           Int     @id @default(autoincrement())
-  rentAble     Boolean
-  rents        Rent[]
-  activeRent   Rent?   @relation("ScooterActiveRent", fields: [activeRentId], references: [id])
-  activeRentId String? @unique
+  id                  Int           @id @default(autoincrement())
+  rentAble            Boolean
+  rents               Rent[]
+  activeRent          Rent?         @relation("ScooterActiveRent", fields: [activeRentId], references: [id])
+  activeRentId        String?       @unique
+  reservations        Reservation[]
+  activeReservation   Reservation?  @relation("ScooterActiveReservation", fields: [activeReservationId], references: [id])
+  activeReservationId String?       @unique
 }
 
 model Rent {
-  id                String    @id @default(uuid(7))
-  user              User      @relation(fields: [userId], references: [id])
+  id                String        @id @default(uuid(7))
+  user              User          @relation(fields: [userId], references: [id])
   userId            Int
-  scooter           Scooter   @relation(fields: [scooterId], references: [id])
+  scooter           Scooter       @relation(fields: [scooterId], references: [id])
   scooterId         Int
   startDate         DateTime
   endDate           DateTime?
-  userActiveRent    User?     @relation("UserActiveRent")
-  scooterActiveRent Scooter?  @relation("ScooterActiveRent")
+  userActiveRent    User?         @relation("UserActiveRent")
+  scooterActiveRent Scooter?      @relation("ScooterActiveRent")
+  Reservation       Reservation[]
+}
+
+model Reservation {
+  id                       String    @id @default(uuid(7))
+  user                     User      @relation(fields: [userId], references: [id])
+  userId                   Int
+  scooter                  Scooter   @relation(fields: [scooterId], references: [id])
+  scooterId                Int
+  expiredAt                DateTime
+  rent                     Rent?     @relation(fields: [rentId], references: [id])
+  rentId                   String?
+  userActiveReservation    User?     @relation("UserActiveReservation")
+  scooterActiveReservation Scooter?  @relation("ScooterActiveReservation")
 }

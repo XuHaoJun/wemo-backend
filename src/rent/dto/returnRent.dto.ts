@@ -1,9 +1,9 @@
-import { Id } from 'src/common/class-validator-ext';
+import { SqlNumberId } from 'src/common/class-validator-ext';
 
 export class ReturnRentDto {
-  @Id()
+  @SqlNumberId()
   userId: number;
 
-  @Id()
+  @SqlNumberId()
   scooterId: number;
 }

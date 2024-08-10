@@ -32,7 +32,7 @@ open `http://localhost:3000/swagger`
 # generate fake data
 npx ts-node ./k6/mutilple_rent_same_scooter/fakeData.ts
 # run k6
-k6 run .\k6\mutilple_rent_same_scooter\script.js
+k6 run ./k6/mutilple_rent_same_scooter/script.js
 ```
 
 ```text

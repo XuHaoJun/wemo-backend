@@ -8,25 +8,91 @@ export class RentService {
   constructor(private readonly prisma: PrismaService) {}
   async rent(body: CreateRentDto) {
     const result = await this.prisma.$transaction(async (prisma) => {
+      const now = new Date();
+
       const rent = await prisma.rent.create({
         data: {
-          startDate: new Date(),
+          startDate: now,
           userId: body.userId,
           scooterId: body.scooterId,
         },
       });
 
+      const user = await prisma.user.findUniqueOrThrow({
+        where: {
+          id: body.userId,
+        },
+      });
+      if (user.activeReservationId) {
+        try {
+          await prisma.reservation.update({
+            where: {
+              id: user.activeReservationId,
+              expiredAt: { lt: now },
+              scooterId: body.scooterId,
+            },
+            data: { rentId: rent.id },
+          });
+        } catch (e: any) {
+          // TODO
+          // should check error
+          throw new BadRequestException(
+            'User reservation has expired or incorrect scooter',
+          );
+        }
+      }
+
       const userUpdateResult = await prisma.user.updateMany({
-        where: { id: body.userId, activeRentId: null },
-        data: { activeRentId: rent.id },
+        where: {
+          AND: [
+            { id: body.userId, activeRentId: null },
+            {
+              OR: [
+                {
+                  activeReservationId: null,
+                },
+                {
+                  activeReservationId: user.activeReservationId,
+                  activeReservation: {
+                    expiredAt: { lt: now },
+                  },
+                },
+              ],
+            },
+          ],
+        },
+        data: { activeRentId: rent.id, activeReservationId: null },
       });
       if (userUpdateResult.count === 0) {
-        throw new BadRequestException('User has active rent');
+        throw new BadRequestException(
+          'User has active rent or incorrect reservation',
+        );
       }
 
       const scooterUpdateResult = await prisma.scooter.updateMany({
-        where: { id: body.scooterId, rentAble: true, activeRentId: null },
-        data: { rentAble: false, activeRentId: rent.id },
+        where: {
+          AND: [
+            { id: body.scooterId, rentAble: true, activeRentId: null },
+            {
+              OR: [
+                {
+                  activeReservationId: null,
+                },
+                {
+                  activeReservationId: user.activeReservationId,
+                  activeReservation: {
+                    expiredAt: { lt: now },
+                  },
+                },
+              ],
+            },
+          ],
+        },
+        data: {
+          rentAble: false,
+          activeRentId: rent.id,
+          activeReservationId: null,
+        },
       });
       if (scooterUpdateResult.count === 0) {
         throw new BadRequestException('Scooter is not rentable');
