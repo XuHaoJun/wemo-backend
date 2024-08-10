@@ -14,10 +14,10 @@ datasource db {
 }
 
 model User {
-  id           Int    @id @default(autoincrement())
+  id           Int     @id @default(autoincrement())
   rents        Rent[]
-  activeRent   Rent?  @relation("UserActiveRent", fields: [activeRentId], references: [id])
-  activeRentId String?   @unique
+  activeRent   Rent?   @relation("UserActiveRent", fields: [activeRentId], references: [id])
+  activeRentId String? @unique
 }
 
 model Scooter {
@@ -25,7 +25,7 @@ model Scooter {
   rentAble     Boolean
   rents        Rent[]
   activeRent   Rent?   @relation("ScooterActiveRent", fields: [activeRentId], references: [id])
-  activeRentId String?    @unique
+  activeRentId String? @unique
 }
 
 model Rent {
