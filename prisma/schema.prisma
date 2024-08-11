@@ -14,24 +14,30 @@ datasource db {
 }
 
 model User {
-  id                  Int           @id @default(autoincrement())
+  id                  Int                                   @id @default(autoincrement())
   rents               Rent[]
-  activeRent          Rent?         @relation("UserActiveRent", fields: [activeRentId], references: [id])
-  activeRentId        String?       @unique
+  activeRent          Rent?                                 @relation("UserActiveRent", fields: [activeRentId], references: [id])
+  activeRentId        String?                               @unique
   reservations        Reservation[]
-  activeReservation   Reservation?  @relation("UserActiveReservation", fields: [activeReservationId], references: [id])
-  activeReservationId String?       @unique
+  activeReservation   Reservation?                          @relation("UserActiveReservation", fields: [activeReservationId], references: [id])
+  activeReservationId String?                               @unique
+  coords              Unsupported("geometry(Point, 4326)")?
+
+  @@index([coords], name: "User_location_idx", type: Gist)
 }
 
 model Scooter {
-  id                  Int           @id @default(autoincrement())
+  id                  Int                                   @id @default(autoincrement())
   rentAble            Boolean
   rents               Rent[]
-  activeRent          Rent?         @relation("ScooterActiveRent", fields: [activeRentId], references: [id])
-  activeRentId        String?       @unique
+  activeRent          Rent?                                 @relation("ScooterActiveRent", fields: [activeRentId], references: [id])
+  activeRentId        String?                               @unique
   reservations        Reservation[]
-  activeReservation   Reservation?  @relation("ScooterActiveReservation", fields: [activeReservationId], references: [id])
-  activeReservationId String?       @unique
+  activeReservation   Reservation?                          @relation("ScooterActiveReservation", fields: [activeReservationId], references: [id])
+  activeReservationId String?                               @unique
+  coords              Unsupported("geometry(Point, 4326)")?
+
+  @@index([coords], name: "Scooter_location_idx", type: Gist)
 }
 
 model Rent {
@@ -48,14 +54,14 @@ model Rent {
 }
 
 model Reservation {
-  id                       String    @id @default(uuid(7))
-  user                     User      @relation(fields: [userId], references: [id])
+  id                       String   @id @default(uuid(7))
+  user                     User     @relation(fields: [userId], references: [id])
   userId                   Int
-  scooter                  Scooter   @relation(fields: [scooterId], references: [id])
+  scooter                  Scooter  @relation(fields: [scooterId], references: [id])
   scooterId                Int
   expiredAt                DateTime
-  rent                     Rent?     @relation(fields: [rentId], references: [id])
+  rent                     Rent?    @relation(fields: [rentId], references: [id])
   rentId                   String?
-  userActiveReservation    User?     @relation("UserActiveReservation")
-  scooterActiveReservation Scooter?  @relation("ScooterActiveReservation")
+  userActiveReservation    User?    @relation("UserActiveReservation")
+  scooterActiveReservation Scooter? @relation("ScooterActiveReservation")
 }
