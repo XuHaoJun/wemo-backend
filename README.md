@@ -1,5 +1,11 @@
 # wemo-backend
 
+## Features
+
+1. 預定車子
+2. 租借車子
+3. 依據地理位置的車輛查詢
+
 ## QuickStart
 
 ```sh
