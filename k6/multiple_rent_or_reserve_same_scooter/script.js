@@ -25,22 +25,20 @@ export default function () {
       'Content-Type': 'application/json',
     },
   };
-  const res = http.post('http://localhost:3000/reservations', payload, params);
+  const api = [
+    { action: 'reserve', url: 'http://localhost:3000/reservations' },
+    { action: 'rent', url: 'http://localhost:3000/rents' },
+  ][randomIntFromInterval(0, 1)];
+  const res = http.post(api.url, payload, params);
   // Validate response status
   check(res, {
-    'user id == 1, reserve success': (r) => userId === 1 && r.status === 201,
-    'user id == 1, reserve failed': (r) => userId === 1 && r.status === 400,
-    'user id == 2, reserve success': (r) => userId === 2 && r.status === 201,
-    'user id == 2, reserve failed': (r) => userId === 2 && r.status === 400,
-    'reserve success': (r) => r.status === 201,
-    'reserve failed': (r) => r.status === 400,
+    'rent success': (r) => api.action === 'rent' && r.status === 201,
+    'rent failed': (r) => api.action === 'rent' && r.status === 400,
+    'reserve success': (r) => api.action === 'reserve' && r.status === 201,
+    'reserve failed': (r) => api.action === 'reserve' && r.status === 400,
   });
   if (res.status === 201) {
-    const res2 = http.post(
-      'http://localhost:3000/reservations',
-      payload,
-      params,
-    );
+    const res2 = http.post(api.url, payload, params);
     check(res2, {
       'reserve again failed': (r) => r.status === 400,
     });
