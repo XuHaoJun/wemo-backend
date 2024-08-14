@@ -1,7 +1,7 @@
-import { SqlNumberId, SqlUuid } from 'src/common/class-validator-ext';
+import { SqlNumberId, SqlUuidV7 } from 'src/common/class-validator-ext';
 
 export class DeleteReservationParamsDto {
-  @SqlUuid()
+  @SqlUuidV7()
   id: string;
 }
 

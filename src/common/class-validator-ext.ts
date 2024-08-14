@@ -17,7 +17,7 @@ export function SqlNumberId(validationOptions?: ValidationOptions) {
   };
 }
 
-export function SqlUuid(validationOptions?: ValidationOptions) {
+export function SqlUuidV7(validationOptions?: ValidationOptions) {
   return function (object: any, propertyName: string) {
     registerDecorator({
       name: 'id',
@@ -27,15 +27,15 @@ export function SqlUuid(validationOptions?: ValidationOptions) {
       constraints: [],
       validator: {
         validate(value: any) {
-          return typeof value === 'string' && isValidUUID(value);
+          return typeof value === 'string' && isValidUUIDv7(value);
         },
       },
     });
   };
 }
 
-function isValidUUID(uuid: string) {
-  const uuidRegex =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-  return uuidRegex.test(uuid);
+function isValidUUIDv7(uuid: string) {
+  const uuidV7Regex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidV7Regex.test(uuid);
 }

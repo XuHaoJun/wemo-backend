@@ -103,7 +103,7 @@ export class ReservationService {
       const scooterUpdateResult = await prisma.scooter.updateMany({
         where: {
           activeReservationId: id,
-          activeRent: {
+          activeReservation: {
             userId: body.userId,
           },
         },
