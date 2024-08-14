@@ -1,14 +1,18 @@
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 async function main() {
   const prisma = new PrismaClient({
     log: ['query', 'info', 'warn', 'error'],
   });
-  for (let i = 0; i < 1000000; i++) {
-    const { latitude, longitude } = getRandomCoordinate();
-    console.log(`(${longitude.toFixed(3)} ${latitude.toFixed(3)})`);
-    const sql = Prisma.sql`INSERT INTO "Scooter" ("rentAble", "coords") VALUES (true, ST_GeomFromText('POINT(${longitude.toFixed(1)} ${latitude.toFixed(1)})', 4326))`;
-    await prisma.$queryRaw(sql);
+  for (let i = 0; i < 10000; i++) {
+    const values = [];
+    for (let j = 0; j < 100; j++) {
+      const { latitude, longitude } = getRandomCoordinate();
+      const point = `POINT(${longitude} ${latitude})`;
+      values.push(`(true, ST_GeomFromText('${point}', 4326))`);
+    }
+    const sql = `INSERT INTO "Scooter" ("rentAble", "coords") VALUES ${values.join(', ')}`;
+    await prisma.$executeRawUnsafe(sql);
   }
 }
 
