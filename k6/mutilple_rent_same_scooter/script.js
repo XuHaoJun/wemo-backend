@@ -1,5 +1,5 @@
 import http from 'k6/http';
-import { check, sleep } from 'k6';
+import { check } from 'k6';
 
 export const options = {
   // A number specifying the number of VUs to run concurrently.
@@ -32,7 +32,6 @@ export default function () {
     'rent failed': (r) => r.status === 400,
   });
   if (res.status === 201) {
-    sleep(1);
     const res2 = http.post('http://localhost:3000/rents', payload, params);
     check(res2, {
       'rent again failed': (r) => r.status === 400,
