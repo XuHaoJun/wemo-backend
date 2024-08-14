@@ -2,10 +2,14 @@ import { InjectRedis } from '@nestjs-modules/ioredis';
 import { Injectable } from '@nestjs/common';
 import Redis from 'ioredis';
 import { NearestScootersDto } from './dto/nearestScooters.dto';
+import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class ScooterService {
-  constructor(@InjectRedis() private readonly redis: Redis) {}
+  constructor(
+    @InjectRedis() private readonly redis: Redis,
+    private readonly prisma: PrismaService,
+  ) {}
 
   // use redis GEORADIUS with key scooter:location
   // find scooters in a certain radius(500m) of a certain location(body.lat, body.lng)
@@ -35,5 +39,20 @@ export class ScooterService {
         },
       };
     });
+  }
+
+  async nearestScooters2(body: NearestScootersDto) {
+    const result = await this.prisma.$queryRaw`
+      SELECT id, ST_Distance(coords::geography, ST_SetSRID(ST_MakePoint(${body.lng}, ${body.lat}), 4326)::geography) AS distance
+      FROM "Scooter"
+      WHERE ST_DWithin(
+          coords::geography,
+          ST_SetSRID(ST_MakePoint(${body.lng}, ${body.lat}), 4326)::geography,
+          500
+      )
+      ORDER BY distance
+      LIMIT 100
+    `;
+    return result;
   }
 }

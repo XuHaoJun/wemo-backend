@@ -10,4 +10,9 @@ export class ScooterController {
   async nearestScooters(@Body() body: NearestScootersDto) {
     return this.scooterService.nearestScooters(body);
   }
+
+  @Post('search/nearest2')
+  async nearestScooters2(@Body() body: NearestScootersDto) {
+    return this.scooterService.nearestScooters2(body);
+  }
 }
