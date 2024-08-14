@@ -28,7 +28,7 @@ export class RentService {
           await prisma.reservation.update({
             where: {
               id: user.activeReservationId,
-              expiredAt: { lt: now },
+              expiredAt: { gte: now },
               scooterId: body.scooterId,
             },
             data: { rentId: rent.id },
@@ -54,7 +54,7 @@ export class RentService {
                 {
                   activeReservationId: user.activeReservationId,
                   activeReservation: {
-                    expiredAt: { lt: now },
+                    expiredAt: { gte: now },
                   },
                 },
               ],
@@ -81,7 +81,7 @@ export class RentService {
                 {
                   activeReservationId: user.activeReservationId,
                   activeReservation: {
-                    expiredAt: { lt: now },
+                    expiredAt: { gte: now },
                   },
                 },
               ],

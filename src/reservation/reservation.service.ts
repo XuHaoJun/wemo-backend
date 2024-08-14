@@ -34,7 +34,7 @@ export class ReservationService {
                 },
                 {
                   activeReservation: {
-                    expiredAt: { gte: now },
+                    expiredAt: { lt: now },
                   },
                 },
               ],
@@ -62,7 +62,7 @@ export class ReservationService {
                 },
                 {
                   activeReservation: {
-                    expiredAt: { gte: now },
+                    expiredAt: { lt: now },
                   },
                 },
               ],
