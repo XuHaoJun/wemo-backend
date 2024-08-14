@@ -2,6 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateRentDto } from './dto/createRent.dto';
 import { ReturnRentDto } from './dto/returnRent.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class RentService {
@@ -100,6 +101,76 @@ export class RentService {
 
       return { rent };
     });
+
+    return result.rent;
+  }
+
+  async rent2(body: CreateRentDto) {
+    const result = await this.prisma.$transaction(
+      async (prisma) => {
+        const now = new Date();
+
+        const rent = await prisma.rent.create({
+          data: {
+            startDate: now,
+            userId: body.userId,
+            scooterId: body.scooterId,
+          },
+        });
+
+        const user = await prisma.user.findUniqueOrThrow({
+          where: {
+            id: body.userId,
+          },
+          include: { activeReservation: true },
+        });
+        if (user.activeReservationId) {
+          try {
+            await prisma.reservation.update({
+              where: {
+                id: user.activeReservationId,
+                expiredAt: { gte: now },
+                scooterId: body.scooterId,
+              },
+              data: { rentId: rent.id },
+            });
+          } catch (e: any) {
+            // TODO
+            // should check error
+            throw new BadRequestException(
+              'User reservation has expired or incorrect scooter',
+            );
+          }
+        }
+
+        if (
+          user.activeRentId !== null ||
+          (user.activeReservationId !== null &&
+            (user.activeReservation.scooterId !== body.scooterId ||
+              user.activeReservation.expiredAt < now))
+        ) {
+          throw new BadRequestException(
+            'User has active rent or incorrect reservation',
+          );
+        }
+
+        const scooter = await prisma.scooter.findUniqueOrThrow({
+          where: {
+            id: body.scooterId,
+          },
+        });
+        if (
+          !scooter.rentAble ||
+          (scooter.activeRentId != null &&
+            scooter.activeReservationId !== user.activeReservationId)
+        ) {
+          throw new BadRequestException('Scooter is not rentable');
+        }
+
+        return { rent };
+      },
+      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+    );
 
     return result.rent;
   }

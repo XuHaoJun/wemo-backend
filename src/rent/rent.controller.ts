@@ -12,6 +12,11 @@ export class RentController {
     return this.rentService.rent(body);
   }
 
+  @Post('rent2')
+  async createRent2(@Body() body: CreateRentDto) {
+    return this.rentService.rent2(body);
+  }
+
   @Patch('return')
   async rentReturn(@Body() body: ReturnRentDto) {
     return this.rentService.return(body);
